@@ -1,36 +1,40 @@
 class Solution {
+    
     public List<String> topKFrequent(String[] words, int k) {
-         // map hold the word: counts
-        HashMap<String, Integer> map = new HashMap();
         
-        // sort the map by frequency high->low order, sort words lexi order
-        PriorityQueue<Map.Entry<String, Integer>> heap = new PriorityQueue<>(
-            (a,b)->{
-                if(a.getValue() != b.getValue())
-                    return a.getValue().compareTo(b.getValue());
-                return -a.getKey().compareTo(b.getKey());
+        List<String> res = new ArrayList<>();
+        
+        TreeMap<String,Integer> tmap = new TreeMap<>();
+        // fill our tmap .
+        for(String s : words)
+            tmap.put(s,tmap.getOrDefault(s,0) + 1);
+        
+        TreeMap<Integer,String> treemap = new TreeMap<>(Collections.reverseOrder());
+        
+        for(Map.Entry m : tmap.entrySet()){
+            if(treemap.get(m.getValue()) == null)
+                treemap.put((Integer)m.getValue(),(String)m.getKey());
+            else{
+                String val = treemap.get(m.getValue());
+                treemap.put((Integer)m.getValue(),val + " " + (String)m.getKey());
             }
-        );
-        
-        // fill the map
-        for(String word: words){
-            map.merge(word, 1, Integer::sum);
         }
         
-        // put into heap
-        for(Map.Entry<String, Integer> entry: map.entrySet()){
-            heap.offer(entry);
-            if(heap.size() > k)
-                heap.poll();
+        
+        for(Map.Entry m : treemap.entrySet()){
+            if(k>0){
+                String str = (String)m.getValue();
+                String[] arr = str.split(" ");
+                for(int i = 0; i<arr.length; i++){
+                    if(k>0){
+                         res.add(arr[i]);
+                         k--;
+                    }
+                }
+            }
         }
+
+        return res;
         
-        // pop out the answer
-        List<String> ans = new ArrayList();
-        while(heap.size() > 0)
-            ans.add(heap.poll().getKey());
-        
-        // check the order
-        Collections.reverse(ans);
-        return ans;
     }
 }
